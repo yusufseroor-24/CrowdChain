@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank</title> <link rel="stylesheet" href="crowdfund.css"> 
+    <script type="module" src="/src/web3.js"></script>
+    <script type="module" src="/src/crowdfund.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <img src="images/logo2.png" class="logo">
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html" class="nav-link"><img src="images/house.png" alt="house" class="nav-icons">Home</a></li>
+                    <li><a href="createcampaign.html" class="nav-link"><img src="images/circle-plus.png" alt="createcampaign" class="nav-icons">Create Campaign</a></li>
+                    <li><a href="donate.html" class="nav-link"><img src="images/hand-heart.png" alt="donate" class="nav-icons">Donate</a></li>
+                    <li><a href="bank.html" class="nav-link"><img src="images/landmark.png" alt="bank" class="nav-icons">Bank</a></li>
+                    <li><a href="profile.html" class="nav-link"><img src="images/circle-user.png" alt="profile" class="nav-icons">Profile</a></li>
+                    <li class="wallet-status-item">
+                        <button id="connectWallet" class="walletnav-btn"><img src="images/wallet.png" alt="wallet" class="nav-icons">Connect Wallet</button>
+                        <span id="walletAdd" class="wallet-address">Not Connected</span>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        
+        <div class="form-container">
+            <div class="form">
+                <h2>Charity Organization Request</h2>
+                <form id="formCharityReq">
+                    <label for="orgName">Organization Name</label>
+                    <input type="text" id="orgName" name="orgName" placeholder="e.g., Global Aid Foundation" required>
+
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" placeholder="Briefly describe the organization's mission and purpose" required></textarea>
+
+                    <label for="document">Supporting Document (URL)</label>
+                    <input type="url" id="document" name="document" placeholder="https://organization.com/legal-docs.pdf" required>
+
+                    <button type="submit" id="createcampbutton">Submit Request</button> 
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="site-footer">
+        <p>&copy; 2025 Crowdfunding Platform. All rights reserved.</p>
+    </footer>
+</body>
+</html>

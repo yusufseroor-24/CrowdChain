@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crowdfunding</title>
+  <link rel="stylesheet" href="crowdfund.css"> 
+<script type="module" src="/src/web3.js"></script>
+<script type="module" src="/src/crowdfund.js"></script>
+</head>
+<body>
+    <div class="container">
+<header class="main-header">
+    <img src="images/logo2.png" class="logo">
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html" class="nav-link"><img src="images/house.png" alt="house" class="nav-icons">Home</a></li>
+                <li><a href="createcampaign.html" class="nav-link"><img src="images/circle-plus.png" alt="createcampaign" class="nav-icons">Create Campaign</a></li>
+                <li><a href="donate.html" class="nav-link"><img src="images/hand-heart.png" class="nav-icons">Donate</a></li>
+                <li><a href="bank.html" class="nav-link"><img src="images/landmark.png" alt="bank" class="nav-icons">Bank</a></li>
+                <li><a href="profile.html" class="nav-link"><img src="images/circle-user.png" alt="profile" class="nav-icons">Profile</a></li>
+                <li class="wallet-status-item">
+                    <button id="connectWallet" class="walletnav-btn"><img src="images/wallet.png" alt="wallet" class="nav-icons">Connect Wallet</button>
+                    <span id="walletAdd" class="wallet-address">Not Connected</span>
+                </li>
+            </ul>
+        </nav>
+</header>
+
+    <section id="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Fund the Future, Today.</h1>
+             <p class="hero-subtitle">Support transparent, blockchain-powered campaigns.</p>
+             <div id="button">
+                <a href="donate.html"><button id="donatebutton" class="primary-btn">DONATE NOW</button></a>
+            </div>
+        </div>
+    </section>
+
+     <h3 class="slogan">Building trust in crowdfunding — powered by blockchain transparency</h3>
+
+    <section class="homecontent content-grid">
+        <div class="homerightpanel panel-card primary-bg">
+            <h2>How the Platform Works</h2>
+            <p>Learn about our secure, decentralized funding process.</p>
+            <p><b>1. Connect Your Wallet:</b> Start by connecting your crypto wallet. This becomes your secure identity on the platform.</p>
+            <p><b>2. Browse Campaigns:</b> Explore live campaigns, their goals, and real-time progress.</p>
+            <p><b>3. Complete KYC Verification:</b> Before donating or creating campaigns, verify your identity for safety and compliance. </p>
+            <p><b>4. Donate or Create:</b> Verified users can donate securely or launch their own campaigns using smart contracts</p>
+            <p><b>5. Track Everything:</b> All transactions appear instantly on the blockchain and a transaction view is provided in your ptofile for web access.</p>
+        </div>
+        <div class="homeleftpanel panel-card secondary-bg">
+            <h2>Crowdfunding Stories</h2>
+            <p>Discover successful campaigns and inspiring journeys.</p>
+            <p><b>Emergency Medical Support for a Family</b> When a family faced unexpected medical bills, they launched a small campaign hoping for any help they could get. The community responded immediately. With blockchain-backed transparency, donors knew every dinar reached the family without delays or intermediaries. 
+                Within 72 hours, the family had enough to cover critical expenses.“We were overwhelmed. Knowing donations went directly to the wallet gave supporters confidence, and gave us hope.” — Campaign Creator</p>
+                <p><b>Students Building the Future</b> Three university students developing a blockchain–IoT prototype struggled to afford sensors and hardware. Their campaign gained attention from tech enthusiasts across the region. 
+                    The team not only met their target — they exceeded it by 40%.
+                    “People believed in us because everything was transparent. Every donation felt like someone saying ‘keep going.’”
+                    — Student Team Member</p>
+        </div>
+    </section>
+    </div>
+    <footer class="site-footer">
+        <p>&copy; 2025 Crowdfunding Platform. All rights reserved.</p>
+    </footer>
+</body>
+</html>

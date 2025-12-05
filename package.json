@@ -1,17 +1,33 @@
 {
-  "name": "hardhat-javascript-starter",
+  "name": "web3",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "web3.js",
   "scripts": {
-    "build": "npx thirdweb@latest detect",
-    "deploy": "npx thirdweb@latest deploy",
-    "publish": "npx thirdweb@latest publish"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "@matterlabs/hardhat-zksync-solc": "^1.1.14",
-    "@matterlabs/hardhat-zksync-verify": "^1.7.1",
-    "hardhat": "^2.19.1"
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "hardhat": "^2.27.0",
+    "vite": "^7.2.2"
   },
   "dependencies": {
-    "@thirdweb-dev/contracts": "^3.8.0",
-    "zksync-ethers": "^5.7.0"
+    "@api/didit-tdmi": "file:api/.api/apis/didit-tdmi",
+    "@openzeppelin/contracts": "^5.5.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "ethers": "^5.8.0",
+    "express": "^5.1.0",
+    "mongoose": "^9.0.0",
+    "node-fetch": "^3.3.2",
+    "web3": "^4.16.0"
   }
 }
