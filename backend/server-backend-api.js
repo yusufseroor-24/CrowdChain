@@ -21,7 +21,53 @@ const connection = process.env.MONGO_URI;
 console.log("MONGO_URI:", process.env.MONGO_URI);
 
 const app = express();
-app.use(express.json());
+const DIDIT_WEBHOOK_SECRET = process.env.DIDIT_WEBHOOK_SECRET;
+
+//webhook endpoint 
+app.post("/didit-webhook", express.raw({type: "*/*" }), async (req, res) => {
+    try{
+        const signature = req.get("X-Signature") || req.get("x-signature"); 
+        const rawBody = req.body;
+        console.log("Webhook received. Signature:", signature, "Body length:", rawBody?.length);
+
+        //verify HMAC signature
+        const hmac = crypto.createHmac("sha256", DIDIT_WEBHOOK_SECRET);
+        hmac.update(rawBody);
+        const digest = hmac.digest("hex");
+
+        if(digest !== signature){
+            console.warn("Invalid webhook signature:", digest, signature);
+            return res.status(401).send("Unauthorized");
+        }
+        const payload = JSON.parse(rawBody.toString());
+        const { vendor_data, status, webhook_type, session_id } = payload;
+        console.log("Webhook verified:", webhook_type, session_id, vendor_data, status);
+
+        if(vendor_data){
+            const user = await User.findOne({ id: vendor_data });
+            if(user){
+                user.kycStatus = status;
+                await user.save();
+                console.log(`User ${user.id} KYC status updated to ${status}`); 
+                if(status.toLowerCase() === "approved"){
+                    try{
+                        await handleKycApproved(user.wallet);
+                        console.log(`Permission granted for ${user.wallet}`);
+                    } catch(err){
+                        console.error("Failed to update permission", err);
+                    }
+                }
+            } else {
+                console.warn("User not found for vendor_data:", vendor_data);
+            }
+        }
+        res.sendStatus(200);
+    } catch(err){
+        console.error("Webhook processing error:", err);
+    }
+});
+
+app.use(express.json()); // for all other routes
 app.use(cors({
     origin: ["http://localhost:5173", "http://127.0.0.1:5173", /\.ngrok-free\.dev$/],
     credentials: true
@@ -183,57 +229,6 @@ app.all('/kyc-callback', async (req, res) => {
     }
 });
 
-const DIDIT_WEBHOOK_SECRET = process.env.DIDIIT_WEBHOOK_SECRET;
-
-app.use(bodyParser.json({
-    verify: (req, res, buf) => {
-        req.rawBody = buf.toString();
-    }
-}));
-
-//webhook endpoint 
-app.post("/didit-webhook", async (req, res) => {
-    try{
-        const signature = req.get("X-Signature"); 
-        const rawBody = req.rawBody;
-
-        //verify HMAC signature
-        const hmac = crypto.createHmac("sha256", DIDIT_WEBHOOK_SECRET);
-        hmac.update(rawBody);
-        const digest = hmac.digest("hex");
-
-        if(digest !== signature){
-            console.warn("Invalid webhook signature:", digest, signature);
-            return res.status(401).send("Unauthorized");
-        }
-        const playload = req.body;
-        const { vendor_data, status, webhook_type, session_id } = playload;
-        console.log("Webhook verified:", webhook_type, session_id, vendor_data, status);
-
-        if(vendor_data){
-            const user = await User.findOne({ id: vendor_data });
-            if(user){
-                user.kycStatus = status;
-                await user.save();
-                console.log(`User ${user.id} KYC status updated to ${status}`); 
-                if(status.toLowerCase() === "approved"){
-                    try{
-                        await handleKycApproved(user.wallet);
-                        console.log(`Permission granted for ${user.wallet}`);
-                    } catch(err){
-                        console.error("Failed to update permission", err);
-                    }
-                }
-            } else {
-                console.warn("User not found for vendor_data:", vendor_data);
-            }
-        }
-        res.sendStatus(200);
-    } catch(err){
-        console.error("Webhook processing error:", err);
-        res.sendStatus(500);
-    }
-});
 //-----------------------------KYC Permission-----------------------
 async function handleKycApproved(userWallet) {
     let tx1 = await contract.setCampaignPermission(userWallet, true);
