@@ -55,15 +55,17 @@
                 <div id="myCampaignsContainer"> </div>
             </div>
 
-            <div id="adminDashboard" style="display: none">
+            <div id="adminDashboard" class="admin-dashboard-box" style="display: none">
+
                 <div id="adminAccessDenied" style="display:none; color:red; font-weight:bold;">
                     Access Denied
                 </div>
+                
                 <h3>Admin Dashboard</h3>
-                <div id="adminAnalytics"></div>
-                <div class="kpi-container" id="adminCards"></div>
-                <canvas id="adminChart" style="height:100px;"></canvas>
                 <button id="downloadJSONBtn">Download All Data (JSON)</button>
+                <div id="adminAnalytics"> <h3>Organization Requests</h3> </div>
+                <div class="kpi-container" id="adminCards"></div>
+                <canvas id="adminChart" style="height:200px;"></canvas>
                 <div id="organizationRequests"></div> 
             </div>
         </section>

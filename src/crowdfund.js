@@ -426,6 +426,10 @@ function showAdminView(){
 
     loadAdminData();
 }
+if(userAcc) {
+    await loadTransactions();
+}
+
 }
 
 async function fetchKYCStatus() {
@@ -448,9 +452,6 @@ async function fetchKYCStatus() {
 }
 
 async function updateKYCStatus(){
-    // const params = new URLSearchParams(window.location.search);
-    // const kycStatus = params.get("status") || localStorage.getItem("kycStatus");
-    // if(!kycStatus) return;
     const kycStatus = await fetchKYCStatus();
     const kycBadge = document.getElementById("kycStatusBadge");
     if(!kycBadge) return;
@@ -461,7 +462,7 @@ async function updateKYCStatus(){
         case "Approved":
             kycBadge.style.color = "green";
             break;
-        case "Rejected":
+        case "Declined":
             kycBadge.style.color = "red";
             break;
         default:
@@ -500,7 +501,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 
     if(document.querySelector(".profile-section")){
-        userProfile();
+        await userProfile();
     }
 
      const connectBtn = document.getElementById("connectWallet");
@@ -834,7 +835,7 @@ function renderAdminCards(data){
     const kyc = stats.kycDistribution || {};
     const kycCards = [
         { title: "KYC Approved", value: kyc.approved || 0 },
-        { title: "KYC Rejected", value: kyc.rejected || 0 },
+        { title: "KYC Declined", value: kyc.declined || 0 },
         { title: "KYC Pending", value: kyc.pending || 0 },
         { title: "KYC Not Started", value: kyc.notStarted || 0 },
     ];

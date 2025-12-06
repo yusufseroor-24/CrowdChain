@@ -75,6 +75,7 @@ app.use(cors({
 
 const provider = new ethers.providers.JsonRpcProvider(process.env.GANACHE_URL);
 const wallet = new ethers.Wallet(process.env.ADMIN_PRIVATE_KEY, provider);
+const adminSigner = new ethers.Wallet(process.env.ADMIN_PRIVATE_KEY, provider);
 const contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, contractABI.abi, wallet);
 
 const start = async() => {
@@ -347,8 +348,8 @@ app.post("/admin-analytics", async (req, res) => {
 
         //KYC status Dis
         const kycApproved = await User.countDocuments({ kycStatus: "Approved" });
-        const kycRejected = await User.countDocuments({ kycStatus: "Rejected" });
-        const kycPending = await User.countDocuments({ kycStatus: "Pending" });
+        const kycDeclined = await User.countDocuments({ kycStatus: "Declined" });
+        const kycPending = await User.countDocuments({ kycStatus: "In Review" });
         const kycNotStarted = await User.countDocuments({ kycStatus: { $in: [null, "", "Not Started"] } });
 
         const campaigns = await contract.getCampaigns();
@@ -365,18 +366,18 @@ app.post("/admin-analytics", async (req, res) => {
         
         // Convert the safe BigInt sum to the final ETH string
         const totalRaisedETH = ethers.utils.formatEther(totalRaisedBigInt);
-        console.log({
-    totalUsers,
-    approvedCharities,
-    pendingCharities,
-    rejectedCharities,
-    kycDistribution: {
-        approved: kycApproved,
-        rejected: kycRejected,
-        pending: kycPending,
-        notStarted: kycNotStarted
-    }
-});
+                console.log({
+            totalUsers,
+            approvedCharities,
+            pendingCharities,
+            rejectedCharities,
+            kycDistribution: {
+                approved: kycApproved,
+                declined: kycDeclined,
+                pending: kycPending,
+                notStarted: kycNotStarted
+            }
+        });
 
         res.json({
             totalUsers,
@@ -387,7 +388,7 @@ app.post("/admin-analytics", async (req, res) => {
             totalRaisedETH: totalRaisedETH,
              kycDistribution: {
                 approved: kycApproved,
-                rejected: kycRejected,
+                declined: kycDeclined,
                 pending: kycPending,
                 notStarted: kycNotStarted
             } 

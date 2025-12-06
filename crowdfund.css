@@ -197,6 +197,7 @@ body{
             padding: 30px;
             border-radius: 15px;
             width: 100%;
+            height: 450px;
         }
         .homeleftpanel{ 
             background-color: #7fc798;
@@ -353,7 +354,7 @@ body{
             border-bottom: none;
         }
 
-        /* --- Profile Section --- */
+       /* --- Profile Section --- **/
         .profile-section{
             margin-top: 100px;
             padding: 20px;
@@ -368,6 +369,23 @@ body{
             background: white;
             padding: 20px;
             margin-bottom: 25px;
+        }
+        #kycBtn {
+            background: #007bff;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        #kycBtn:hover {
+             background: #0056c7;
+         }
+        #kycStatusBadge {
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #ddd;
+            font-weight: bold;
         }
         .analytics-row{
             display: flex;
@@ -424,6 +442,50 @@ body{
             display: inline-block;
             width: 250px;
         }
+        #adminAnalytics {
+            border: 2px solid #d3d3d3;
+            border-radius: 12px;
+            background: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            max-height: 300px;
+            overflow-y: auto;  
+            overflow-x: hidden;
+        }
+        .kpi-container#adminCards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            border: 2px solid #d3d3d3;
+            border-radius: 12px;
+            background: white;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        #adminChart {
+            margin-top: 15px;
+            max-height: 600px;
+            max-width: 80%;
+            margin-left: auto;  
+            margin-right: auto; 
+            display: block;  
+        }
+        #downloadJSONBtn {
+            margin-bottom: 15px;
+            margin-top: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: #7fc798;
+            border: none;
+            color: white;
+            cursor: pointer;
+
+        }
+        #downloadJSONBtn:hover {
+            background-color: #a08f7c;
+            font-weight: bolder;
+        }
+
 
         /* --- Organizations Page Styles --- */
         .organizations {
@@ -485,6 +547,8 @@ body{
             }
         }
         
+        
+
         /* --- Footer --- */
         .site-footer {
             background-color: #faf9f5;
@@ -494,3 +558,5 @@ body{
             color: #666;
             margin-top: 40px;
         }
+
+        
