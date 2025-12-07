@@ -908,8 +908,6 @@ function renderAdminChart(campaigns){
             body: JSON.stringify({ userId })
         });
         const data = await res.json();
-        // const adminAnalytics = document.getElementById("adminAnalytics");
-        // adminAnalytics.innerHTML = "";
 
         data.requests.forEach(req => {
             const div = document.createElement("div");
@@ -919,10 +917,14 @@ function renderAdminChart(campaigns){
             <p>${req.description}<p>
             <p>Wallet: ${req.wallet}</p>
             <p>Status: ${req.status}</p>
-            <button onclick="updateCharity('${req.id}','Approved')">Approve</button>
-            <button onclick="updateCharity('${req.id}','Rejected')">Reject</button>
+            <button onclick="updateCharity('${req.id}','Approved')" class="approveCharityBtn">Approve</button>
+            <button onclick="updateCharity('${req.id}','Rejected')" class="rejectCharityBtn">Reject</button>
             `;
             adminAnalytics.appendChild(div);
+
+            const line = document.createElement("hr"); 
+            line.classList.add("request-line"); 
+            adminAnalytics.appendChild(line);
         });
     }
 
