@@ -252,23 +252,27 @@ body{
             border: none;
         }
         #createcampbutton:hover{
-            background-color: #a08f7c;
+            background-color: green;
         }
-
-        /* --- Donate / Campaign Card Styles --- */
         .campaigns{
             padding: 100px 20px 20px 20px;
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
+            justify-content: space-between;
+            margin-left: 20px;
+            margin-right: 20px;
         }
         .campaign-card{
+            margin-top: 12px;
             border-radius: 15px;
             box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
-            padding: 15px;
+            padding: 20px;
             width: 250px;
             cursor: pointer;
             transition: transform 0.2s;
+            background-color: #faf9f5;
+            max-height: 400px;
         }
         .campaign-card:hover {
             transform: scale(1.03);
@@ -288,6 +292,14 @@ body{
                 background-color: white; 
                 overflow-y: auto;
             }
+        .campaign-detail img{
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+                border-radius: 10px;
+                margin-top: 5px;
+                margin-bottom: 2px;
+        }
         .campaign-card img{
             width: 100%;
             object-fit: cover;
@@ -298,7 +310,7 @@ body{
             width: 100%;
             border-radius: 5px;
             overflow: hidden;
-            height: 20px;
+            height: 27px;
             margin: 10px 0;
             background: lightgrey;
         }
@@ -309,6 +321,7 @@ body{
             line-height: 20px;
             background: #4caf50;
             transition: width 0.5s ease;
+            font-weight: bold;
         }
         .donation-part{
             margin-top: 10px;
@@ -328,9 +341,11 @@ body{
             padding: 9px 17px;
             cursor: pointer;
             border: none;
-            background-color: #7fc798;
+            font-size: 15px;
+            background-color: lightgray;
         }
         .donatebutton:hover{
+            background-color: green;
             font-weight: bolder;
         }
         .donor-box{
@@ -493,14 +508,17 @@ body{
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
+            justify-content: space-between;
+            margin-left: 20px;
+            margin-right: 20px;
         }
-
         .organization-card {
             border-radius: 15px;
             box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
             padding: 15px;
-            width: 500px;
+            width: 600px;
             transition: transform 0.2s;
+            background-color: #faf9f5;
         }
 
         .organization-card:hover {
@@ -525,14 +543,33 @@ body{
             color: #666;
             margin: px 0;
         }
-    
+        .orgDonateBtn{
+            border-radius: 7px;
+            padding: 9px 17px;
+            cursor: pointer;
+            border: none;
+            font-size: 15px;
+            background-color: lightgray;
+        }
+        .orgDonateBtn:hover{
+            background-color: green;
+            font-weight: bolder;
+        }
         .org-heading {
-            text-align: center;     
-            font-size: 28px;          
+            text-align: center;   
+            font-size: 40px;          
             font-weight: bold;        
             margin: 35px 0 10px;      
             color: #333;             
             text-transform: uppercase; 
+        }
+        .org-heading::before,
+        .org-heading::after{
+            content: '';
+            display: block;
+            border-top: 2px solid #000;
+            margin: 10px 0;
+            width: 100%;
         }
         .closeBtn {
             position: absolute; 
@@ -548,7 +585,6 @@ body{
         }
         
         
-
         /* --- Footer --- */
         .site-footer {
             background-color: #faf9f5;

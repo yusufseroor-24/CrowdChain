@@ -742,7 +742,7 @@ async function loadingOrganizations(){
         if(o.approved){
             card.innerHTML += `
                     <input type="number" id="orgDonation${index}" placeholder="Amount in ETH">
-                    <button onclick="donateToOrg(${index})">Donate</button>
+                    <button onclick="donateToOrg(${index})" class="orgDonateBtn">Donate</button>
             `;
         } else{
             card.innerHTML += `<p><i>Pending approval by admin</i></p>`;
