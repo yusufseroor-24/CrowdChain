@@ -1,0 +1,21 @@
+{
+  "name": "crowdchain-backend",
+  "version": "1.0.0",
+  "description": "Backend API for CrowdChain",
+  "main": "server-backend-api.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server-backend-api.js",
+    "dev": "nodemon server-backend-api.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^9.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "body-parser": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

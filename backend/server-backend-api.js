@@ -69,7 +69,7 @@ app.post("/didit-webhook", express.raw({type: "*/*" }), async (req, res) => {
 
 app.use(express.json()); // for all other routes
 app.use(cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173", /\.ngrok-free\.dev$/],
+    origin: ["http://localhost:5173", "https://crowd-chain-2412.vercel.app", /\.ngrok-free\.dev$/],
     credentials: true
 }));
 
@@ -221,7 +221,7 @@ app.all('/kyc-callback', async (req, res) => {
         //redirect user after GET
         if(req.method === "GET"){
             const verificationSessionId = req.query.verificationSessionId;
-            return res.redirect(`http://localhost:5173/profile?verificationSessionId=${verificationSessionId}&status=${status}`);
+            return res.redirect(`https://crowd-chain-2412.vercel.app/profile?verificationSessionId=${verificationSessionId}&status=${status}`);
         }
         return res.sendStatus(200);
     } catch(err){
