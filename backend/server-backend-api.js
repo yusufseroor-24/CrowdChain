@@ -11,6 +11,8 @@ import { ethers } from "ethers";
 import crypto from "crypto";
 import bodyParser from 'body-parser';
 import fs from "fs";
+import multer from "multer";
+
 
 const contractABI = JSON.parse(
   fs.readFileSync(path.resolve("./Crowdfunding.json"), "utf8")
@@ -21,6 +23,7 @@ const connection = process.env.MONGO_URI;
 console.log("MONGO_URI:", process.env.MONGO_URI);
 
 const app = express();
+app.use("/uploads", express.static("uploads"));
 const DIDIT_WEBHOOK_SECRET = process.env.DIDIT_WEBHOOK_SECRET;
 
 //webhook endpoint 
@@ -67,11 +70,56 @@ app.post("/didit-webhook", express.raw({type: "*/*" }), async (req, res) => {
     }
 });
 
+
 app.use(express.json()); // for all other routes
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: ["http://localhost:5173", "https://crowd-chain-2412.vercel.app", /\.ngrok-free\.dev$/],
+    origin: ["http://localhost:5173", /\.ngrok-free\.dev$/],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
+
+//recaptcha 
+async function verifyRecaptcha(token){
+    if(!token) return false;
+    try{
+        const response = await fetch("https://www.google.com/recaptcha/api/siteverify" , {
+            method: "POST",
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            body: new URLSearchParams({
+                secret: process.env.RECAPTCHA_SECRET,
+                response: token
+            })
+        });
+        const data = await response.json();
+        console.log("Recaptcha API response:", data);
+        return data.success === true;
+    } catch(err){
+        console.error("reCAPTCHA Verification Error:", err);
+        return false;
+    }
+}
+
+async function recaptchaMiddleware(req, res, next) {
+    const token = req.body?.["g-recaptcha-response"];
+    console.log("reCAPTCHA token:", token);
+
+    const isHuman = await verifyRecaptcha(token);
+    console.log("Is human?", isHuman);
+
+    if (!isHuman) {
+        return res.status(403).json({error: "reCAPTCHA Verification Failed" });
+    }
+    //Remove token
+    delete req.body["g-recaptcha-response"];
+    next();
+}
+
+app.post("/verify-campaign-captcha", recaptchaMiddleware, (req, res) => {
+   return res.json({ ok: true });
+});
+
+
 
 const provider = new ethers.providers.JsonRpcProvider(process.env.GANACHE_URL);
 const wallet = new ethers.Wallet(process.env.ADMIN_PRIVATE_KEY, provider);
@@ -221,7 +269,7 @@ app.all('/kyc-callback', async (req, res) => {
         //redirect user after GET
         if(req.method === "GET"){
             const verificationSessionId = req.query.verificationSessionId;
-            return res.redirect(`https://crowd-chain-2412.vercel.app/profile?verificationSessionId=${verificationSessionId}&status=${status}`);
+            return res.redirect(`https://unsputtering-shayne-disquisitional.ngrok-free.dev/profile.html?verificationSessionId=${verificationSessionId}&status=${status}`);
         }
         return res.sendStatus(200);
     } catch(err){
@@ -260,11 +308,34 @@ app.post("/get-user-role", async (req,res) => {
     }
 });
 
+//----------------------------drag and drop------------------------------- 
+//storage location 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb){
+        cb(null, "uploads/");
+    },
+    filename: function (req, file, cb){
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random()* 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+//------------------------accept PDF only-----------------------------
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === "application/pdf"){
+        cb(null, true);
+    } else {
+        cb(new Error("Only PDF files are allowed"), false);
+    }
+};
+const upload = multer({ storage: storage, fileFilter: fileFilter }); 
 
 //-------------------------Charity req route---------------------------
-app.post("/submit-charity", async (req, res) => {
-    const {orgName, wallet, description, documents} = req.body;
-    if(!orgName || !wallet || !description || !documents){
+app.post("/submit-charity", upload.single("document"), recaptchaMiddleware, async (req, res) => {
+    const {orgName, wallet, description} = req.body;
+    const documentFile = req.file;    
+
+    if(!orgName || !wallet || !description || !documentFile){
         return res.status(400).json({ error: "Missing required fields"});
     }
     const newReq = new CharityReq({
@@ -272,7 +343,7 @@ app.post("/submit-charity", async (req, res) => {
         orgName,
         wallet,
         description,
-        documents
+        documents: documentFile.path 
     });
     await newReq.save();
     res.json({ message: "Charity request submitted", request: newReq });

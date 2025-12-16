@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Campaign</title>
     <link rel="stylesheet" href="crowdfund.css"> 
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script type="module" src="/src/web3.js"></script>
     <script type="module" src="/src/crowdfund.js"></script>
 </head>
@@ -45,6 +46,9 @@
 
                     <label for="image">Image URL (Optional)</label>
                     <input type="url" id="image" name="image" placeholder="https://sample.com/image.jpg">
+
+                    <div class="g-recaptcha" data-sitekey="6LcOGSYsAAAAABwZIMcnB2a6ZKBAkwBMP3yStO9s" style="margin: 15px 0;">
+                    </div>
 
                     <button type="submit" id="createcampbutton">Create Campaign</button>
                 </form>

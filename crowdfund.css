@@ -4,28 +4,23 @@ body{
             margin: 0;
             padding: 0;
         }
-
         .container{
             text-align: center;
             margin-top: 0;
             margin-left: auto;
             margin-right: auto;
         }
-
         h2{
             font-size: 32px;
             color: #333;
         }
-        
         .homecontent h2, .homecontent h1{ 
             font-size: 26px;
         }
-        
         p{
             font-size: 18px;
             color: #666;
         }
-
         .main-header{ 
             width: 100%;
             background-color: #faf9f5;
@@ -51,7 +46,6 @@ body{
             object-fit: cover;
             margin: 0;
         }
-
         .main-nav ul{
             display: flex;
             list-style: none;
@@ -61,16 +55,13 @@ body{
             padding: 0;
             gap: 20px;
         }
-
         .main-nav li{
             margin: 0;
             font-size: 18px;
         }
-        
         .main-nav li:first-child{
             margin-right: auto;
         }
-
         .nav-link{ 
             display: flex;
             margin: 0 12px;
@@ -83,13 +74,11 @@ body{
             font-weight: bolder;
              transition: font-weight 0.3;
         }
-        
         .nav-icons{
             width: 20px; 
             height: 20px; 
             margin-right: 6px;
         }
-
         /* Wallet Status */
         .wallet-status-item {
             display: flex;
@@ -97,7 +86,6 @@ body{
             align-items: flex-end;
             justify-content: center;
         }
-
         .walletnav-btn{
             background: none;
             border: none;
@@ -116,7 +104,6 @@ body{
             font-weight: bolder;
             transition: font-weight 0.3;
         }
-
         #walletAdd, .wallet-address{ 
             font-size: 15px;
             min-width: 150px;
@@ -125,7 +112,6 @@ body{
             overflow: hidden;
             text-overflow: ellipsis; 
         }
-
          #homeview, #hero-section{ 
             background: url(images/home.jpg) no-repeat; 
             background-size: 100%;
@@ -154,7 +140,6 @@ body{
             color: white; 
             margin-bottom: 20px;
         }
-
          #donatebutton, .primary-btn{ 
          font-size: 25px;
          text-decoration: none;
@@ -167,7 +152,6 @@ body{
          transition: 0.3s;
          z-index: 999;
         }  
-
          #button button:hover, #button .primary-btn:hover{ 
             background-color: #faf9f5;
             color:black;
@@ -212,7 +196,7 @@ body{
             color: black;
         }
         .homerightpanel{ 
-            background-color: #a08f7c;
+            background-color: lightslategray;
             margin-right: 40px;
         }
        
@@ -282,7 +266,8 @@ body{
             cursor: pointer;
             transition: transform 0.2s;
             background-color: #faf9f5;
-            max-height: 400px;
+            max-height: 450px;
+            overflow-y: auto;
         }
         .campaign-card:hover {
             transform: scale(1.03);
@@ -312,9 +297,9 @@ body{
         }
         .campaign-card img{
             width: 100%;
+            max-height: 200px;
             object-fit: cover;
             border-radius: 10px;
-            margin-bottom: 10px;
         }
         .progress-bar {
             width: 100%;
@@ -625,9 +610,24 @@ body{
             .organization-card {
                 width: 100%;
             }
+        }  
+    /* drag and drop in organization form */
+        #drop-area {
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: background 0.3s;
+        margin-bottom: 15px;
         }
-        
-        
+        #drop-area.dragover {
+            background: #f0f0f0;
+        }
+        #drop-area input[type="file"] {
+            display: none;
+        }
+
         /* --- Footer --- */
         .site-footer {
             background-color: #faf9f5;

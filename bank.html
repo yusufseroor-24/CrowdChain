@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bank</title> <link rel="stylesheet" href="crowdfund.css"> 
+    <title>Bank</title> 
+    <link rel="stylesheet" href="crowdfund.css"> 
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script type="module" src="/src/web3.js"></script>
     <script type="module" src="/src/crowdfund.js"></script>
 </head>
@@ -36,8 +38,14 @@
                     <label for="description">Description</label>
                     <textarea id="description" name="description" placeholder="Briefly describe the organization's mission and purpose" required></textarea>
 
-                    <label for="document">Supporting Document (URL)</label>
-                    <input type="url" id="document" name="document" placeholder="https://organization.com/legal-docs.pdf" required>
+                    <label for="document">Supporting Document (PDF)</label>
+                    <div id="drop-area">
+                        <p>Drag & Drop your PDF here or click to select</p>
+                        <input type="file" id="document" name="document" accept="application/pdf" required>
+                    </div>
+
+                    <div class="g-recaptcha" data-sitekey="6LcOGSYsAAAAABwZIMcnB2a6ZKBAkwBMP3yStO9s" style="margin: 15px 0;">
+                    </div>
 
                     <button type="submit" id="createcampbutton">Submit Request</button> 
                 </form>

@@ -1,12 +1,11 @@
 import hre from "hardhat";
-//const hre = require("hardhat");
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
   console.log("Deploying contracts with account:", deployer.address);
 
   const Crowdfunding = await hre.ethers.getContractFactory("Crowdfunding");
-  const crowdfunding = await Crowdfunding.deploy(); // add constructor args if needed
+  const crowdfunding = await Crowdfunding.deploy();
   await crowdfunding.deployed();
 
   console.log("Crowdfunding deployed to:", crowdfunding.address);
@@ -19,3 +18,17 @@ main()
     process.exit(1);
   });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+  

@@ -1,7 +1,8 @@
 import Web3 from "web3";
 import CrowdfundingABI from "./abi/Crowdfunding.json";
 
-const CONTRACT_ADDRESS = "0x7487dd04c563B756a759C46BC5178BFAfe82742e"; //Address of the deployed smart contract 
+//Address of the deployed smart contract 
+const CONTRACT_ADDRESS = "0x5d19EbD3A35DbE7A16e23FB35D8FC2Db5dE3Aa72"; 
 let web3;
 let contract; 
 

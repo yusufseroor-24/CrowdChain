@@ -2,52 +2,172 @@ import { initWeb3, getContract, getWeb3 } from "./web3.js";
 import Web3, { ERR_CONTRACT_RESOLVER_MISSING } from "web3";
 
 //create campaign.js
-//--------------------------------------Create Campaign-----------------------------------------------
-async function createCampaign(event){
-    event.preventDefault(); //prevents the form from reloading 
-    const kycStatus = await fetchKYCStatus();
-        if(kycStatus !== "Approved"){
-            alert("You cannot create a campaign until your KYC has been Approved.");
-            return;
-        }
+// //--------------------------------------Create Campaign-----------------------------------------------
+// async function createCampaign(event){
+//     event.preventDefault(); //prevents the form from reloading 
+    
+//     const recaptchaToken = grecaptcha.getResponse();
+//     if(!recaptchaToken){
+//         alert("Please complete the reCAPTCHA verification.");
+//         return;
+//     }
+//     const captchaCheck = await fetch("https://unsputtering-shayne-disquisitional.ngrok-free.dev/verify-campaign-captcha", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({
+//     "g-recaptcha-response": recaptchaToken
+//         })
+//     });
+    
+//     if (!captchaCheck.ok) {
+//         alert("Bot detection triggered. Campaign creation blocked.");
+//         grecaptcha.reset();
+//         return;
+//     }    
 
+//     const kycStatus = await fetchKYCStatus();
+//         if(kycStatus !== "Approved"){
+//             alert("You cannot create a campaign until your KYC has been Approved.");
+//             return;
+//         }
+
+//     const title = document.getElementById("title")?.value;
+//     const description = document.getElementById("description")?.value;
+//     const goal = document.getElementById("goal")?.value;
+//     const endDate = document.getElementById("endingDate")?.value;
+//     const image = document.getElementById("image")?.value || ""; //if image is empty; empty string so function doesnt break
+
+//     if(!title || !description || !goal || !endDate) {
+//         alert("Please fill in all the required fields");
+//         return;
+//     }
+//         const web3 = getWeb3();
+//         const contract = getContract();
+//         const accounts = await web3.eth.getAccounts();
+//         const owner = accounts[0];
+
+//         if(!owner){
+//             alert("Please connect to your walllet first.");
+//             return;
+//         }
+
+//     const currentTimeStamp = Math.floor(Date.now() / 1000);
+//     const deadlineUnix = Math.floor(new Date(endDate).getTime() / 1000);
+
+//     if(deadlineUnix < currentTimeStamp){
+//         alert ("You can't set a deadline in the past! ");
+//         return;
+//     }
+    
+//     //saftey try block so that if campaign has an error it catches it 
+//     try {
+//         //conversion
+//         const targetWei = web3.utils.toWei(goal, "ether");
+//         await contract.methods.createCampaign(
+//             owner, title, description, targetWei, deadlineUnix, image).send({ from: owner});
+//         alert("Your Campaign has successfully been created!");
+//         grecaptcha.reset();
+//     } catch (err) {
+//         console.error(err);
+//         alert("Error while creating campaign. Check Console.");
+//     }
+// }
+
+//--------------------------------------Create Campaign-----------------------------------------------
+async function createCampaign(event) {
+    event.preventDefault(); // prevents the form from reloading 
+
+    // --- reCAPTCHA verification ---
+    const recaptchaToken = grecaptcha.getResponse();
+    if (!recaptchaToken) {
+        alert("Please complete the reCAPTCHA verification.");
+        return;
+    }
+    const captchaCheck = await fetch("https://unsputtering-shayne-disquisitional.ngrok-free.dev/verify-campaign-captcha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ "g-recaptcha-response": recaptchaToken })
+    });
+
+    if (!captchaCheck.ok) {
+        alert("Bot detection triggered. Campaign creation blocked.");
+        grecaptcha.reset();
+        return;
+    }
+
+    // --- KYC verification ---
+    const kycStatus = await fetchKYCStatus();
+    if (kycStatus !== "Approved") {
+        alert("You cannot create a campaign until your KYC has been Approved.");
+        return;
+    }
+
+    // --- Form values ---
     const title = document.getElementById("title")?.value;
     const description = document.getElementById("description")?.value;
     const goal = document.getElementById("goal")?.value;
     const endDate = document.getElementById("endingDate")?.value;
-    const image = document.getElementById("image")?.value || ""; //if image is empty; empty string so function doesnt break
+    const image = document.getElementById("image")?.value || "";
 
-    if(!title || !description || !goal || !endDate) {
+    if (!title || !description || !goal || !endDate) {
         alert("Please fill in all the required fields");
         return;
     }
-        const web3 = getWeb3();
-        const contract = getContract();
-        const accounts = await web3.eth.getAccounts();
-        const owner = accounts[0];
 
-        if(!owner){
-            alert("Please connect to your walllet first.");
-            return;
-        }
+    // --- Web3 & contract setup ---
+    const web3 = getWeb3();
+    const contract = getContract();
+    const accounts = await web3.eth.getAccounts();
+    const owner = accounts[0];
+
+    if (!owner) {
+        alert("Please connect to your wallet first.");
+        return;
+    }
 
     const currentTimeStamp = Math.floor(Date.now() / 1000);
     const deadlineUnix = Math.floor(new Date(endDate).getTime() / 1000);
 
-    if(deadlineUnix < currentTimeStamp){
-        alert ("You can't set a deadline in the past! ");
+    if (deadlineUnix < currentTimeStamp) {
+        alert("You can't set a deadline in the past!");
         return;
     }
-    //saftey try block so that if campaign has an error it catches it 
+
+    // --- Debug info ---
+    console.log("=== Campaign Debug Info ===");
+    console.log("Owner:", owner);
+    console.log("Title:", title);
+    console.log("Description:", description);
+    console.log("Goal (ETH):", goal);
+    console.log("Deadline (Unix):", deadlineUnix);
+    console.log("Image URL:", image);
+
     try {
-        //conversion
+        // --- Convert goal to Wei ---
         const targetWei = web3.utils.toWei(goal, "ether");
-        await contract.methods.createCampaign(
-            owner, title, description, targetWei, deadlineUnix, image).send({ from: owner});
+
+        // --- Simulation call to catch errors before sending ---
+        await contract.methods.createCampaign(owner, title, description, targetWei, deadlineUnix, image)
+            .call({ from: owner });
+        console.log("Call simulation succeeded ✅");
+
+        // --- Send transaction ---
+        const receipt = await contract.methods.createCampaign(owner, title, description, targetWei, deadlineUnix, image)
+            .send({ from: owner, gas: 5000000 });
+        console.log("Transaction receipt:", receipt);
+
         alert("Your Campaign has successfully been created!");
+        grecaptcha.reset();
     } catch (err) {
-        console.error(err);
-        alert("Error while creating campaign. Check Console.");
+        console.error("Transaction failed ❌", err);
+
+        // Try to extract revert reason from Ganache/MetaMask error
+        if (err?.data) {
+            const revertReason = Object.values(err.data)[0]?.reason;
+            if (revertReason) console.error("Revert reason:", revertReason);
+        }
+
+        alert("Error while creating campaign. Check console for details.");
     }
 }
 
@@ -213,10 +333,12 @@ function showCampaignDetail(index){
     loadDonors(index);
     //donation button listener 
     const donatebutton = detail.querySelector(".donatebutton");
+    if(donatebutton){
     donatebutton.addEventListener("click", () => { 
         const idx = donatebutton.dataset.index;
         donate(Number(idx));
     });
+    }
     //function to close the detail view of the campaign
     window.closeDetail = function(){
         const detail = document.getElementById("campaign-detail"); //div from HTML 
@@ -515,25 +637,35 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 
     const charityForm = document.getElementById("formCharityReq");
-if(charityForm){
-    charityForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const orgName = document.getElementById("orgName").value;
-        const description = document.getElementById("description").value;
-        const documents = document.getElementById("document").value;
-        const wallet = userAcc;
+    if(charityForm){
+        charityForm.addEventListener("submit", async (e) => {
+         e.preventDefault();
+
+        const token = grecaptcha.getResponse();
+         if(!token){
+            alert("Please complete the reCAPTCHA verification.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("orgName", document.getElementById("orgName").value);
+        formData.append("description", document.getElementById("description").value);
+        formData.append("wallet", userAcc);
+        formData.append("document", fileInput.files[0]);
+        formData.append("g-recaptcha-response", token);
         
     try{
         const res = await fetch("https://unsputtering-shayne-disquisitional.ngrok-free.dev/submit-charity", {
             method: "POST",
-            headers: { "Content-Type": "application/json"},
-            body: JSON.stringify({ orgName, wallet, description, documents })
+            body: formData
         });
         const data = await res.json();
         if(!res.ok){
             alert("Error: " + (data.error || "Uknown error"));
         }else{
         alert(data.message);
+        grecaptcha.reset();
+        dropArea.querySelector("p").textContent = "Drag & Drop your PDF here or click to select";
         }
     } catch(err){
         console.error("Submit charity failed:", err);
@@ -572,7 +704,6 @@ if (typeof window.ethereum !== "undefined") {
                 localStorage.setItem("userRole", data.user.role || "USER");
             }
 
-            // ⭐ NEW PART (VERY minimal)
             const role = localStorage.getItem("userRole");
             if (role !== "ADMIN") {
                 // switched to user → deny admin analytics
@@ -917,6 +1048,7 @@ function renderAdminChart(campaigns){
             <p>${req.description}<p>
             <p>Wallet: ${req.wallet}</p>
             <p>Status: ${req.status}</p>
+            <p>Document: <a href="https://unsputtering-shayne-disquisitional.ngrok-free.dev/${req.documents}" target="_blank">Download PDF</a></p>
             <button onclick="updateCharity('${req.id}','Approved')" class="approveCharityBtn">Approve</button>
             <button onclick="updateCharity('${req.id}','Rejected')" class="rejectCharityBtn">Reject</button>
             `;
@@ -1015,6 +1147,37 @@ async function downloadAllData() {
 }
 const downloadBtn = document.getElementById("downloadJSONBtn");
 if (downloadBtn) downloadBtn.addEventListener("click", downloadAllData);
+
+//--------------------drag and drop pdf function-----------------------------
+const dropArea = document.getElementById('drop-area');
+const fileInput = document.getElementById('document');
+
+if(dropArea && fileInput){
+//click file dialog
+dropArea.addEventListener('click', () => fileInput.click());
+
+//drag over
+dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropArea.classList.add('dragover');
+});
+//drag leave
+dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+
+//drop
+dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
+
+    const files = e.dataTransfer.files;
+    if(files.length > 0 && files[0].type === "application/pdf") {
+        fileInput.files = files;
+        dropArea.querySelector('p').textContent = `Selected: ${files[0].name}`;
+    } else {
+        alert("Please upload a PDF file.");
+    }
+});
+}
 
 
 
