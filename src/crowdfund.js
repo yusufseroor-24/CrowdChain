@@ -1,78 +1,6 @@
 import { initWeb3, getContract, getWeb3 } from "./web3.js";
 import Web3, { ERR_CONTRACT_RESOLVER_MISSING } from "web3";
 
-//create campaign.js
-// //--------------------------------------Create Campaign-----------------------------------------------
-// async function createCampaign(event){
-//     event.preventDefault(); //prevents the form from reloading 
-    
-//     const recaptchaToken = grecaptcha.getResponse();
-//     if(!recaptchaToken){
-//         alert("Please complete the reCAPTCHA verification.");
-//         return;
-//     }
-//     const captchaCheck = await fetch("https://unsputtering-shayne-disquisitional.ngrok-free.dev/verify-campaign-captcha", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({
-//     "g-recaptcha-response": recaptchaToken
-//         })
-//     });
-    
-//     if (!captchaCheck.ok) {
-//         alert("Bot detection triggered. Campaign creation blocked.");
-//         grecaptcha.reset();
-//         return;
-//     }    
-
-//     const kycStatus = await fetchKYCStatus();
-//         if(kycStatus !== "Approved"){
-//             alert("You cannot create a campaign until your KYC has been Approved.");
-//             return;
-//         }
-
-//     const title = document.getElementById("title")?.value;
-//     const description = document.getElementById("description")?.value;
-//     const goal = document.getElementById("goal")?.value;
-//     const endDate = document.getElementById("endingDate")?.value;
-//     const image = document.getElementById("image")?.value || ""; //if image is empty; empty string so function doesnt break
-
-//     if(!title || !description || !goal || !endDate) {
-//         alert("Please fill in all the required fields");
-//         return;
-//     }
-//         const web3 = getWeb3();
-//         const contract = getContract();
-//         const accounts = await web3.eth.getAccounts();
-//         const owner = accounts[0];
-
-//         if(!owner){
-//             alert("Please connect to your walllet first.");
-//             return;
-//         }
-
-//     const currentTimeStamp = Math.floor(Date.now() / 1000);
-//     const deadlineUnix = Math.floor(new Date(endDate).getTime() / 1000);
-
-//     if(deadlineUnix < currentTimeStamp){
-//         alert ("You can't set a deadline in the past! ");
-//         return;
-//     }
-    
-//     //saftey try block so that if campaign has an error it catches it 
-//     try {
-//         //conversion
-//         const targetWei = web3.utils.toWei(goal, "ether");
-//         await contract.methods.createCampaign(
-//             owner, title, description, targetWei, deadlineUnix, image).send({ from: owner});
-//         alert("Your Campaign has successfully been created!");
-//         grecaptcha.reset();
-//     } catch (err) {
-//         console.error(err);
-//         alert("Error while creating campaign. Check Console.");
-//     }
-// }
-
 //--------------------------------------Create Campaign-----------------------------------------------
 async function createCampaign(event) {
     event.preventDefault(); // prevents the form from reloading 
@@ -861,7 +789,9 @@ async function loadingOrganizations(){
         const orgName = o.name || "Unnamed";
         const orgDesc = o.description || "";
         const orgWallet = o.wallet || "";
-        const orgImage = "https://via.placeholder.com/150";
+        const orgImage = o.image && o.image !== ""
+        ? o.image
+        : "https://via.placeholder.com/150";
 
         card.innerHTML = `
         <h4>${orgName}</h4>
@@ -1033,6 +963,9 @@ function renderAdminChart(campaigns){
     async function loadAdminData(){
         const userId = localStorage.getItem("userId");
         if(!userId) return;
+
+        adminAnalytics.innerHTML = "";
+
         const res = await fetch("https://unsputtering-shayne-disquisitional.ngrok-free.dev/admin-charity-req", {
             method: "POST",
             headers: { "Content-Type": "application/json"},

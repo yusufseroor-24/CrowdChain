@@ -79,15 +79,16 @@ app.use(cors({
     credentials: true
 }));
 
-//recaptcha 
+//recaptcha server-side validation 
 async function verifyRecaptcha(token){
     if(!token) return false;
     try{
+        //  POST request to google reCAPTCHA verification endpoint
         const response = await fetch("https://www.google.com/recaptcha/api/siteverify" , {
             method: "POST",
             headers: {"Content-Type": "application/x-www-form-urlencoded"},
             body: new URLSearchParams({
-                secret: process.env.RECAPTCHA_SECRET,
+                secret: process.env.RECAPTCHA_SECRET, //server side secret key 
                 response: token
             })
         });
@@ -100,6 +101,7 @@ async function verifyRecaptcha(token){
     }
 }
 
+//express middlewere to check if it passes reCAPTCHA 
 async function recaptchaMiddleware(req, res, next) {
     const token = req.body?.["g-recaptcha-response"];
     console.log("reCAPTCHA token:", token);
