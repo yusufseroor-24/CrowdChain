@@ -1,6 +1,9 @@
 import { initWeb3, getContract, getWeb3 } from "./web3.js";
 import Web3, { ERR_CONTRACT_RESOLVER_MISSING } from "web3";
 
+let donateCaptchaWidgetId = null;
+let orgDonateCaptchaWidgetIds = {}; 
+
 //--------------------------------------Create Campaign-----------------------------------------------
 async function createCampaign(event) {
     event.preventDefault(); // prevents the form from reloading 
@@ -219,6 +222,7 @@ function showCampaignDetail(index){
     <input type="number" id="donationAmount" placeholder="Enter amount of donation in ETH" min="0" step="0.01">
     <button class="donatebutton" data-index="${index}">Donate</button>
     </div>
+    <div id="donateCaptcha" class="designRecap" style="margin: 15px 0;"></div>
     <div class="creator-wallet">
         <p><b>Campaign Creator:</b> ${c.owner}</p>
     </div>
@@ -229,6 +233,20 @@ function showCampaignDetail(index){
         </div>
     </div>
     `;
+    const el = document.getElementById("donateCaptcha");
+
+        if (!window.grecaptcha || !el) {
+            console.warn("reCAPTCHA not ready or donateCaptcha placeholder missing");
+        } else {
+            //If rendered before, reset it
+            if (donateCaptchaWidgetId !== null) {
+                try { grecaptcha.reset(donateCaptchaWidgetId); } catch (e) {}
+        } else {
+                donateCaptchaWidgetId = grecaptcha.render(el, {
+                sitekey: "6LcOGSYsAAAAABwZIMcnB2a6ZKBAkwBMP3yStO9s"
+                });
+            }
+        } 
     detail.style.display = "block"; //shows the view by making the div visible
     loadDonors(index);
     //donation button listener 
@@ -284,6 +302,24 @@ async function donate(index){
         return;
     }
 
+    const recaptchaToken = grecaptcha.getResponse(donateCaptchaWidgetId);
+        if(!recaptchaToken){
+             alert("Please complete the reCAPTCHA verification.");
+            return;
+         }
+
+    const captchaCheck = await fetch("https://unsputtering-shayne-disquisitional.ngrok-free.dev/verify-donate-captcha", {
+             method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ "g-recaptcha-response": recaptchaToken })
+         });
+
+    if(!captchaCheck.ok){
+            alert("Bot detection triggered. Donation blocked.");
+            grecaptcha.reset(donateCaptchaWidgetId);
+            return;
+        }
+
      const kycStatus = await fetchKYCStatus();
     if (kycStatus !== "Approved") {
         alert("Please complete KYC verification before donating.");
@@ -303,11 +339,13 @@ async function donate(index){
             value: amountWei,
         });
         alert("Donation Sucessful!");
+        grecaptcha.reset(donateCaptchaWidgetId);
         closeDetail();
         await loadingCampaigns();
     } catch(error){
         console.error(error);
         alert("Your Donation Failed.");
+        grecaptcha.reset(donateCaptchaWidgetId);
     }
 }
 
@@ -346,16 +384,16 @@ async function userProfile(){
     campaignContainer.innerHTML = "";
 
 userCampaigns.forEach((c) => {
-   const raised = Number(Web3.utils.fromWei(c.amountCollected, "ether"));
-   const goal = Number(Web3.utils.fromWei(c.target, "ether"));
-   const completion = Math.min((raised/goal) * 100, 100).toFixed(2);
-   const deadline = new Date(Number(c.deadline) * 1000);
-   const daysLeft = Math.max(Math.ceil((deadline - new Date()) / (1000*60*60*24)), 0);
-   const status = daysLeft > 0 ? "Active" : "Completed";
+    const raised = Number(Web3.utils.fromWei(c.amountCollected, "ether"));
+    const goal = Number(Web3.utils.fromWei(c.target, "ether"));
+    const completion = Math.min((raised/goal) * 100, 100).toFixed(2);
+    const deadline = new Date(Number(c.deadline) * 1000);
+    const daysLeft = Math.max(Math.ceil((deadline - new Date()) / (1000*60*60*24)), 0);
+    const status = daysLeft > 0 ? "Active" : "Completed";
 
-   const div = document.createElement("div");
-   div.classList.add("campaign-card");
-   div.innerHTML = `
+    const div = document.createElement("div");
+    div.classList.add("campaign-card");
+    div.innerHTML = `
         <h4>${c.title}</h4>
         <p>${c.description}</p>
         <p><b>Raised:</b> ${raised} / ${goal} ETH</p>
@@ -367,33 +405,33 @@ userCampaigns.forEach((c) => {
         <button class="hideCampaignBtn" data-index="${c.realIndex}"></button>
    `;
 
-   //attach click listner to withdraw button 
-   const withdrawBtn = div.querySelector(".withdrawBtn");
-   withdrawBtn.addEventListener("click", () => withdrawFunds(c.realIndex));
+    //attach click listner to withdraw button 
+    const withdrawBtn = div.querySelector(".withdrawBtn");
+    withdrawBtn.addEventListener("click", () => withdrawFunds(c.realIndex));
 
-   const hideBtn = div.querySelector(".hideCampaignBtn");
-   function updateHideBtn(){
-    if(hidden(c.realIndex)){
+    const hideBtn = div.querySelector(".hideCampaignBtn");
+    function updateHideBtn(){
+        if(hidden(c.realIndex)){
         hideBtn.innerText = "Hidden";
         hideBtn.style.backgroundColor = "red";
-    } else {
-        hideBtn.innerText = "Hide Campaign";
-        hideBtn.style.backgroundColor = "grey";
+        } else {
+            hideBtn.innerText = "Hide Campaign";
+            hideBtn.style.backgroundColor = "grey";
+        }
     }
-   }
 
-   hideBtn.addEventListener("click", () => {
-    if(hidden(c.realIndex)){
-        unhideCampaign(c.realIndex);
-    } else {
-        hideCampaign(c.realIndex);
-    }
+    hideBtn.addEventListener("click", () => {
+        if(hidden(c.realIndex)){
+            unhideCampaign(c.realIndex);
+        } else {
+            hideCampaign(c.realIndex);
+        }
+        updateHideBtn();
+        });
+
     updateHideBtn();
+    campaignContainer.appendChild(div);
     });
-
-   updateHideBtn();
-   campaignContainer.appendChild(div);
-});
 
    //RBAC views
     if(role === "ADMIN"){
@@ -584,6 +622,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         formData.append("orgName", document.getElementById("orgName").value);
         formData.append("description", document.getElementById("description").value);
         formData.append("wallet", userAcc);
+        formData.append("image", document.getElementById("image").value.trim());
         formData.append("document", fileInput.files[0]);
         formData.append("g-recaptcha-response", token);
         
@@ -808,22 +847,49 @@ async function loadingOrganizations(){
         if(o.approved){
             card.innerHTML += `
                     <input type="number" id="orgDonation${index}" placeholder="Amount in ETH">
+                    <div id="orgCaptcha${index}" class="g-recaptcha designRecap"></div>
                     <button onclick="donateToOrg(${index})" class="orgDonateBtn">Donate</button>
             `;
         } else{
             card.innerHTML += `<p><i>Pending approval by admin</i></p>`;
         }
         orgsContainer.appendChild(card);
+        if (window.grecaptcha) {
+            orgDonateCaptchaWidgetIds[index] = grecaptcha.render(`orgCaptcha${index}`, {
+                sitekey: "6LcOGSYsAAAAABwZIMcnB2a6ZKBAkwBMP3yStO9s"
+            });
+        }
     });
 }
 window.loadingOrganizations = loadingOrganizations;
 
 async function donateToOrg(index){
+      const widgetId = orgDonateCaptchaWidgetIds[index];
+  const token = grecaptcha.getResponse(widgetId);
+  if(!token){
+    alert("Please complete the reCAPTCHA verification.");
+    return;
+  }
+
+  const captchaCheck = await fetch("https://unsputtering-shayne-disquisitional.ngrok-free.dev/verify-org-donate-captcha", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ "g-recaptcha-response": token })
+  });
+
+  if(!captchaCheck.ok){
+    alert("Bot detection triggered. Donation blocked.");
+    grecaptcha.reset(widgetId);
+    return;
+  }
+
     const amountEther = document.getElementById(`orgDonation${index}`).value;
     if(!amountEther || amountEther <= 0){
         alert("Enter a valid donation amount");
+        grecaptcha.reset(widgetId);
         return;
     }
+
     const amountWei = getWeb3().utils.toWei(amountEther, "ether");
     const accounts = await getWeb3().eth.getAccounts();
     try{
@@ -832,10 +898,12 @@ async function donateToOrg(index){
         value: amountWei
     });
     alert("Donation successful!");
+    grecaptcha.reset(widgetId);
     await loadingOrganizations();
 } catch(err){
     console.error("Organization Donation failed", err);
     alert("Donation failed");
+    grecaptcha.reset(widgetId);
 }
 }
 window.donateToOrg = donateToOrg;

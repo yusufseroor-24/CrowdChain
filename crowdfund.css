@@ -627,7 +627,11 @@ body{
         #drop-area input[type="file"] {
             display: none;
         }
-
+        .designRecap{
+            transform: scale(0.85);
+            transform-origin: 0 0;
+            margin: 0 !important;
+            }
         /* --- Footer --- */
         .site-footer {
             background-color: #faf9f5;

@@ -334,7 +334,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 //-------------------------Charity req route---------------------------
 app.post("/submit-charity", upload.single("document"), recaptchaMiddleware, async (req, res) => {
-    const {orgName, wallet, description} = req.body;
+    const {orgName, wallet, description, image} = req.body;
     const documentFile = req.file;    
 
     if(!orgName || !wallet || !description || !documentFile){
@@ -345,6 +345,7 @@ app.post("/submit-charity", upload.single("document"), recaptchaMiddleware, asyn
         orgName,
         wallet,
         description,
+        image: image || "",
         documents: documentFile.path 
     });
     await newReq.save();
@@ -374,11 +375,13 @@ app.post("/update-charity-status", async (req, res) => {
         try{
             console.log("Registering organization on-chain...");
 
+            const img = (request.image || "").trim();
+
             const tx = await contract.registerOrganization(
                 request.wallet,
                 request.orgName,
                 request.description,
-                request.image || ""
+                img
             );
             await tx.wait();
             console.log("Organization registered on-chain", tx.hash);

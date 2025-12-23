@@ -5,6 +5,7 @@ const charitySchema = new mongoose.Schema({
     orgName: String,
     wallet: String,
     description: String,
+    image: { type: String, default: ""},
     documents: String,
     status: { type: String, enum:["Pending", "Approved", "Rejected"], default:"Pending"},
     createdAt: { type: Date, default: Date.now}
