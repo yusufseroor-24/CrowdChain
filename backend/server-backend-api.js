@@ -83,7 +83,7 @@ app.use(cors({
 async function verifyRecaptcha(token){
     if(!token) return false;
     try{
-        //  POST request to google reCAPTCHA verification endpoint
+        //POST request to google reCAPTCHA verification endpoint
         const response = await fetch("https://www.google.com/recaptcha/api/siteverify" , {
             method: "POST",
             headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -271,7 +271,7 @@ app.all('/kyc-callback', async (req, res) => {
         //redirect user after GET
         if(req.method === "GET"){
             const verificationSessionId = req.query.verificationSessionId;
-            return res.redirect(`https://unsputtering-shayne-disquisitional.ngrok-free.dev/profile.html?verificationSessionId=${verificationSessionId}&status=${status}`);
+            return res.redirect(`http://localhost:5173/profile.html?verificationSessionId=${verificationSessionId}&status=${status}`);
         }
         return res.sendStatus(200);
     } catch(err){

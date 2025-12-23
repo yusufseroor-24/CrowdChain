@@ -42,7 +42,6 @@ async function createCampaign(event) {
         return;
     }
 
-    // --- Web3 & contract setup ---
     const web3 = getWeb3();
     const contract = getContract();
     const accounts = await web3.eth.getAccounts();
@@ -61,7 +60,6 @@ async function createCampaign(event) {
         return;
     }
 
-    // --- Debug info ---
     console.log("=== Campaign Debug Info ===");
     console.log("Owner:", owner);
     console.log("Title:", title);
@@ -74,11 +72,6 @@ async function createCampaign(event) {
         // --- Convert goal to Wei ---
         const targetWei = web3.utils.toWei(goal, "ether");
 
-        // --- Simulation call to catch errors before sending ---
-        await contract.methods.createCampaign(owner, title, description, targetWei, deadlineUnix, image)
-            .call({ from: owner });
-        console.log("Call simulation succeeded ✅");
-
         // --- Send transaction ---
         const receipt = await contract.methods.createCampaign(owner, title, description, targetWei, deadlineUnix, image)
             .send({ from: owner, gas: 5000000 });
@@ -87,9 +80,8 @@ async function createCampaign(event) {
         alert("Your Campaign has successfully been created!");
         grecaptcha.reset();
     } catch (err) {
-        console.error("Transaction failed ❌", err);
+        console.error("Transaction failed", err);
 
-        // Try to extract revert reason from Ganache/MetaMask error
         if (err?.data) {
             const revertReason = Object.values(err.data)[0]?.reason;
             if (revertReason) console.error("Revert reason:", revertReason);
@@ -157,7 +149,8 @@ async function connectWallet(){
         if(connectBtn){
             connectBtn.innerText = `Connected: ${userAcc.slice(0,6)}...${userAcc.slice(-4)}`;
         }
-        // sessionStorage.setItem("userAcc", userAcc);
+        sessionStorage.setItem("userAcc", userAcc);
+
         //-------------------------------register user in backend------------------------------
         const res = await fetch("https://unsputtering-shayne-disquisitional.ngrok-free.dev/register-user", {
             method: "POST",
@@ -179,27 +172,6 @@ async function connectWallet(){
         alert("Failed to connect to your wallet. Check MetaMask.");
     }
 }
-
-    window.addEventListener("load", async () => {
-        if(typeof window.ethereum !=="undefined"){
-            const savedAccount = sessionStorage.getItem("userAcc");
-            const accounts = await window.ethereum.request({method: "eth_accounts"});
-
-            if(savedAccount && accounts.length > 0){
-                userAcc = accounts[0];
-                const connectBtn = document.getElementById("walletAdd");
-                 if(connectBtn){
-                    connectBtn.innerText = `Connected: ${userAcc.slice(0,6)}...${userAcc.slice(-4)}`;
-                }
-            } else {
-                sessionStorage.removeItem("userAcc");
-                const connectBtn = document.getElementById("walletAdd");
-                if(connectBtn){
-                    connectBtn.innerText = "Not Connected";
-                }
-            }
-        }
-    });
 
     //attach to the button in HTML
     const connectBtn = document.getElementById("connectWallet");
@@ -311,6 +283,13 @@ async function donate(index){
         alert("Connect your wallet first.");
         return;
     }
+
+     const kycStatus = await fetchKYCStatus();
+    if (kycStatus !== "Approved") {
+        alert("Please complete KYC verification before donating.");
+        return;
+    }
+
     const amountEther = document.getElementById("donationAmount").value;
     if (!amountEther || amountEther <= 0) {
         alert("Enter a valid donation amount.");
@@ -520,11 +499,37 @@ async function updateKYCStatus(){
     }
 }
 
+async function restoreWalletUI() {
+    if (typeof window.ethereum === "undefined") return;
+
+    try {
+        const accounts = await window.ethereum.request({ method: "eth_accounts" });
+        const connectBtn = document.getElementById("walletAdd");
+
+        if (accounts.length > 0) {
+            userAcc = accounts[0];
+            sessionStorage.setItem("userAcc", userAcc);
+
+            if (connectBtn) {
+                connectBtn.innerText = `Connected: ${userAcc.slice(0,6)}...${userAcc.slice(-4)}`;
+            }
+        } else {
+            userAcc = null;
+            sessionStorage.removeItem("userAcc");
+
+            if (connectBtn) {
+                connectBtn.innerText = "Not Connected";
+            }
+        }
+    } catch (err) {
+        console.error("Failed to restore wallet UI:", err);
+    }
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
     await initWeb3();
 
-    const accounts = await getWeb3().eth.getAccounts();
-    if(accounts.length > 0) userAcc = accounts[0];
+    await restoreWalletUI();
 
   // Ensure userId exists before updating KYC status
     const userId = localStorage.getItem("userId");
