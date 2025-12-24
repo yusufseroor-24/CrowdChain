@@ -601,8 +601,8 @@ body{
         }
         .closeBtn {
             position: absolute; 
-            top: 12px;         
-            left: 10px;        
+            top: 25px;         
+            left: 7px;        
             font-size: 25px; 
             cursor: pointer;   
         }
